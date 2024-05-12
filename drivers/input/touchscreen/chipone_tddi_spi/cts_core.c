@@ -2268,9 +2268,40 @@ init_hwdata:
         return -ENODEV;
     }
 
-    cts_info("Touch info size:%zu", sizeof(struct cts_device_touch_info));
+#if 0
+#ifdef CFG_CTS_FIRMWARE_FORCE_UPDATE
+	cts_warn("Force update firmware");
+	firmware = cts_request_firmware(cts_dev,
+		CTS_DEV_HWID_ANY, CTS_DEV_FWID_ANY, 0);
+#else /* CFG_CTS_FIRMWARE_FORCE_UPDATE */
+	firmware = cts_request_firmware(cts_dev, hwid, fwid, device_fw_ver);
+#endif /* CFG_CTS_FIRMWARE_FORCE_UPDATE */
 
-    return ret;
+	retries = 0;
+update_firmware:
+	if (firmware) {
+		++retries;
+		ret = cts_update_firmware(cts_dev, firmware, true);
+		if (ret) {
+			cts_err("Update firmware failed %d retries %d", ret,
+				retries);
+
+			if (retries < 3) {
+				cts_plat_reset_device(cts_dev->pdata);
+				goto update_firmware;
+			}
+		}
+		cts_release_firmware(firmware);
+	} else {
+		if (fwid != CTS_DEV_FWID_INVALID) {
+			ret = cts_init_fwdata(cts_dev);
+			if (ret) {
+				cts_err("Device init firmware data failed %d", ret);
+			}
+		}
+	}
+#endif
+	return 0;
 }
 
 #ifdef CFG_CTS_GESTURE
