@@ -64,3 +64,7 @@ cp -nf $(pwd)/kernelbuild/Image $(pwd)/AnyKernel3
 cp -nr $(pwd)/modulebuild/*.ko $(pwd)/AnyKernel3/modules/system/lib/modules
 cd AnyKernel3 && zip -r9 UPDATE-AnyKernel3-gta9.zip * -x .git README.md *placeholder
 
+# Cleanups
+echo "Cleaning out/ directory..."
+rm -rf out/
+echo "Done."
