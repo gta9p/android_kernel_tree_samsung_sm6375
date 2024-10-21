@@ -1,0 +1,2 @@
+## Clone
+    git clone https://github.com/gta9p/android_kernel_tree_samsung_sm6375
